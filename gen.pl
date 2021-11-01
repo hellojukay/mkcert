@@ -60,6 +60,10 @@ sub mk_sign(){
     system("openssl x509 -req -days 120 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt");
     system("openssl x509 -in server.crt -noout -text");
 }
+
+
+#################### main ########################
+
 mk_root_crt();
 mk_openssh_cnf($ip,$domain);
 mk_cert_request();
