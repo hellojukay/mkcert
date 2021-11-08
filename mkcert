@@ -49,6 +49,7 @@ sub mk_openssh_cnf(@) {
     my $domain = shift;
     $ENV{"IP"} = $ip;
     $ENV{"DOMAIN"} = $domain;
+    # windows 用户无法运行
     system("envsubst < openssl.cnf > _openssl.cnf");
 }
 
