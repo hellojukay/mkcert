@@ -6,7 +6,7 @@ mkcert -ip=127.0.0.1 -domain=localhost
 
 ```
 hellojukay@local mkcert (main) $ mkcert -h
-mkcert [options]  generate tsl cert.
+mkcert [options]  generate TLS cert.
     -h
     --help        Print help message
 

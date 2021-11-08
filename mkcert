@@ -13,7 +13,7 @@ GetOptions("o|output=s" => \(my $output),
 sub usage($) {
     my $code = shift;
     my $msg = <<EOF;
-[options]  generate tsl cert.
+[options]  generate TLS cert.
     -h
     --help        Print help message
 
