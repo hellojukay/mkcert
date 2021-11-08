@@ -1,12 +1,12 @@
 # mkcert
 自签名 nginx 证书
 ```
-perl gen.pl -ip=127.0.0.1 -domain=localhost
+mkcert -ip=127.0.0.1 -domain=localhost
 ```
 
 ```
-hellojukay@local mkcert (main) $ perl gen.pl -h
-[options]  generate tsl cert.
+hellojukay@local mkcert (main) $ mkcert -h
+mkcert [options]  generate tsl cert.
     -h
     --help        Print help message
 
