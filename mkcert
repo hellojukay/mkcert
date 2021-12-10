@@ -58,7 +58,7 @@ sub mk_cert_request() {
     system("openssl req -new -key server.key -out server.csr -config _openssl.cnf");
 }
 sub mk_sign(){
-    system("openssl x509 -req -days 120 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt");
+    system("openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt");
     system("openssl x509 -in server.crt -noout -text");
 }
 
