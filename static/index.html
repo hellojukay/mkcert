@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>https证书生成</title>
 </head>
 
 <body>
@@ -37,7 +37,7 @@ server {
 </body>
 <script>
     function check(domain, ip) {
-        if (! /^[a-za-Z0-9.-]+$/.test(domain)) {
+        if (! /^[a-zA-Z0-9.-]+$/.test(domain)) {
             alert(`${domain} 不是合法域名`)
             return false
         }
