@@ -23,3 +23,8 @@ mkcert [options]  generate TLS cert.
 ```
 
 # 通过接口
+```
+go build
+./mkcert-server
+# open localhost:8080
+```
