@@ -4,19 +4,24 @@ use warnings;
 
 use Getopt::Long;
 
-GetOptions("o|output=s" => \(my $output),
-           "ip=s"       => \(my $ip),
-           "domain=s"   => \(my $domain),
-           "h|help"     => \(my $help),
-           "v|verbose"  => \(my $verbose));
+GetOptions(
+    "root-key=s" => \( my $key ),
+    "root-crt=s" => \( my $crt ),
+    "o|output=s" => \( my $output ),
+    "ip=s"       => \( my $ip ),
+    "domain=s"   => \( my $domain ),
+    "h|help"     => \( my $help ),
+    "v|verbose"  => \( my $verbose )
+);
 
 sub usage($) {
     my $code = shift;
-    my $msg = <<EOF;
+    my $msg  = <<EOF;
 mkcert [options]  generate TLS cert.
     -h
     --help        Print help message
-
+    --root-crt    根证书文件 ca.crt
+    --root-key    根证书私钥匙文件 ca.key
     --domain      你的域名
     --ip          你的ip地址
 
@@ -27,11 +32,11 @@ EOF
     exit($code);
 }
 
-if($help) {
+if ($help) {
     usage(0);
 }
 
-if( (not $ip) || (not $domain)){
+if ( ( not $ip ) || ( not $domain ) ) {
     usage(1);
 }
 
@@ -39,33 +44,52 @@ END {
     system("rm -f server.csr");
     system("rm -f ca.srl");
     system("rm -rf _openssl.cnf");
-};
-sub mk_root_crt(){
-    system("openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -subj \"/C=CN/ST=HuBei/L=WuHan/O=BBFE\" -keyout ca.key  -out ca.crt")
+}
+
+sub mk_root_crt() {
+    system(
+"openssl req -new -newkey rsa:2048 -days 1000 -nodes -x509 -subj \"/C=CN/ST=HuBei/L=WuHan/O=BBFE\" -keyout ca.key  -out ca.crt"
+    );
 }
 
 sub mk_openssh_cnf(@) {
-    my $ip = shift;
+    my $ip     = shift;
     my $domain = shift;
-    $ENV{"IP"} = $ip;
+    $ENV{"IP"}     = $ip;
     $ENV{"DOMAIN"} = $domain;
+
     # windows 用户无法运行
     system("envsubst < openssl.cnf > _openssl.cnf");
 }
 
 sub mk_cert_request() {
     system("openssl genrsa -out server.key 2048");
-    system("openssl req -new -key server.key -out server.csr -config _openssl.cnf");
+    system(
+        "openssl req -new -key server.key -out server.csr -config _openssl.cnf"
+    );
 }
-sub mk_sign(){
-    system("openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt");
+
+sub mk_sign(@) {
+    my $crt = shift;
+    my $key = shift;
+    $crt = "ca.crt" unless ($crt);
+    $key = "ca.key" unless ($key);
+    system(
+"openssl x509 -req -days 1000 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt"
+    );
     system("openssl x509 -in server.crt -noout -text");
 }
 
-
 #################### main ########################
+if ( defined($key) && defined($crt) ) {
+    mk_openssh_cnf( $ip, $domain );
+    mk_cert_request();
+    mk_sign( $key, $crt );
+}
+else {
+    mk_root_crt();
+    mk_openssh_cnf( $ip, $domain );
+    mk_cert_request();
+    mk_sign( "ca.crt", "ca.key" );
+}
 
-mk_root_crt();
-mk_openssh_cnf($ip,$domain);
-mk_cert_request();
-mk_sign();
