@@ -88,6 +88,7 @@ func (cert certServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	var address string
 	flag.StringVar(&address, "address", "127.0.0.1:8080", "server binding address")
+	flag.Parse()
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	var s certServer
 	http.Handle("/static/", http.StripPrefix("/", http.FileServer(http.FS(content))))
