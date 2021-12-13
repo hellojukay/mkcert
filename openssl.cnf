@@ -19,7 +19,7 @@ L  = WuHan
 O  = 开发部门
 CN = BBFE
  
-commonName = localhost.com
+commonName = ${DOMAIN}
 # Allow client and server auth. You may want to only allow server auth.
 # Link to SAN names.
 [v3_req]

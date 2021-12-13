@@ -16,3 +16,10 @@ mkcert [options]  generate TLS cert.
     -v
     --verbose     Print debug log
 ```
+
+使用已经存在的 CA 证书
+```
+./mkcert --domain=localhost --ip='127.0.0.1' --root-crt=ca.crt --root-key=ca.key
+```
+
+# 通过接口

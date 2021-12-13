@@ -40,14 +40,28 @@ if ( ( not $ip ) || ( not $domain ) ) {
     usage(1);
 }
 
+BEGIN {
+    system("rm -rf server.crt");
+    system("rm -rf server.key");
+}
+
 END {
     system("rm -f server.csr");
     system("rm -f ca.srl");
     system("rm -rf _openssl.cnf");
 }
 
+sub run ($) {
+    my $cmd = shift;
+    printf("$cmd\n");
+    if ( system($cmd) ) {
+        printf( "[%s] exit 1\n", $cmd );
+        exit(1);
+    }
+}
+
 sub mk_root_crt() {
-    system(
+    run(
 "openssl req -new -newkey rsa:2048 -days 1000 -nodes -x509 -subj \"/C=CN/ST=HuBei/L=WuHan/O=BBFE\" -keyout ca.key  -out ca.crt"
     );
 }
@@ -63,8 +77,8 @@ sub mk_openssh_cnf(@) {
 }
 
 sub mk_cert_request() {
-    system("openssl genrsa -out server.key 2048");
-    system(
+    run("openssl genrsa -out server.key 2048");
+    run(
         "openssl req -new -key server.key -out server.csr -config _openssl.cnf"
     );
 }
@@ -72,23 +86,22 @@ sub mk_cert_request() {
 sub mk_sign(@) {
     my $crt = shift;
     my $key = shift;
-    $crt = "ca.crt" unless ($crt);
-    $key = "ca.key" unless ($key);
-    system(
-"openssl x509 -req -days 1000 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt"
+    run(
+"openssl x509 -req -days 1000 -in server.csr -CA $crt -CAkey $key -CAcreateserial -extensions v3_req -extfile _openssl.cnf -out server.crt"
     );
-    system("openssl x509 -in server.crt -noout -text");
+    run("openssl x509 -in server.crt -noout -text");
 }
 
 #################### main ########################
+mk_openssh_cnf( $ip, $domain );
+
 if ( defined($key) && defined($crt) ) {
-    mk_openssh_cnf( $ip, $domain );
+    printf("key $key crt $crt\n");
     mk_cert_request();
-    mk_sign( $key, $crt );
+    mk_sign( $crt, $key );
 }
 else {
     mk_root_crt();
-    mk_openssh_cnf( $ip, $domain );
     mk_cert_request();
     mk_sign( "ca.crt", "ca.key" );
 }
